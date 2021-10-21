@@ -19,7 +19,7 @@ type StreamServicer interface {
 
 type StreamService struct {
 	lastID uint64
-	mu     sync.Mutex
+	mu     sync.RWMutex
 }
 
 func NewStreamService() StreamServicer {
@@ -30,32 +30,25 @@ func NewStreamService() StreamServicer {
 }
 
 func (s *StreamService) LastID() uint64 {
-	s.mu.Lock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	last := s.lastID
-	s.mu.Unlock()
 	return last
 }
 
-// func (s *StreamService) incrementLastId() {
-// 	s.mu.Lock()
-// 	s.lastID++
-// 	s.mu.Unlock()
-// }
-
 func (s *StreamService) newId() uint64 {
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.lastID++
 	newId := s.lastID
-	s.mu.Unlock()
 	return newId
 }
 
 func validateStreamId(streamID uint64) error {
 	if streamID < 1 {
 		return errors.New("incorrect stream Id")
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func validateStream(stream streaming.Stream) error {

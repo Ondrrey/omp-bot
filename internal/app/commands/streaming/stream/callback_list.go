@@ -14,7 +14,7 @@ type CallbackListData struct {
 }
 
 func (c *StreamCommand) CallbackList(callback *tgbotapi.CallbackQuery, callbackPath path.CallbackPath) {
-	parsedData := CallbackListData{}
+	var parsedData CallbackListData
 	err := json.Unmarshal([]byte(callbackPath.CallbackData), &parsedData)
 	if err != nil {
 		log.Printf("StreamCommander.CallbackList: "+

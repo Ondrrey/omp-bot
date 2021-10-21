@@ -21,9 +21,16 @@ func (c *StreamCommand) Delete(inputMessage *tgbotapi.Message) {
 		return
 	}
 
-	if _, err := c.streamService.Remove(streamID); err != nil {
+	result, err := c.streamService.Remove(streamID)
+	if err != nil {
 		SendAndLog(c.bot, inputMessage.Chat.ID, err.Error())
-	} else {
-		SendAndLog(c.bot, inputMessage.Chat.ID, fmt.Sprintf("Successfully deleted stream with ID=%d", streamID))
+		return
 	}
+
+	if !result {
+		SendAndLog(c.bot, inputMessage.Chat.ID, fmt.Sprintf("Could not delete stream with ID=%d", streamID))
+		return
+	}
+
+	SendAndLog(c.bot, inputMessage.Chat.ID, fmt.Sprintf("Successfully deleted stream with ID=%d", streamID))
 }

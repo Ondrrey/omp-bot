@@ -2,8 +2,11 @@ package streaming
 
 import (
 	"fmt"
+	"log"
 	"time"
 )
+
+const defaultTimeFormat = "2006/01/02 15:04:05"
 
 type Stream struct {
 	Id          uint64    `json:"id,omitempty"`
@@ -14,7 +17,13 @@ type Stream struct {
 }
 
 func (stream *Stream) PrintableTime() string {
-	return stream.StreamTime.UTC().Format("2006/01/02 15:04:05")
+	msk, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		log.Println("MSK timezone loading error:", err.Error())
+		return stream.StreamTime.Format(defaultTimeFormat)
+	}
+
+	return stream.StreamTime.In(msk).Format(defaultTimeFormat)
 }
 
 func (stream *Stream) String() string {
